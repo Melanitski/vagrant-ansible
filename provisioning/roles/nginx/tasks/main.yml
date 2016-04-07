@@ -1,0 +1,30 @@
+---
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Add virtualhost configuration
+  template:
+    src: virtualhost.conf
+    dest: /etc/nginx/sites-available/{{ item.server_name }}
+  with_items: virtual_hosts
+  notify: nginx reload
+
+- name: Disable virtualhosts
+  file:
+    path: /etc/nginx/sites-enabled/{{ item.server_name }}
+    state: absent
+  when: item.disabled is defined
+  with_items: virtual_hosts
+  notify: nginx reload
+
+- name: Enable virtualhosts
+  file:
+    src: /etc/nginx/sites-available/{{ item.server_name }}
+    dest: /etc/nginx/sites-enabled/{{ item.server_name }}
+    state: link
+  when: item.disabled is not defined
+  with_items: virtual_hosts
+  notify: nginx reload
+
+- name: restart nginx
+  service: name=nginx state=restarted
