@@ -1,0 +1,4 @@
+- src: https://github.com/Oefenweb/ansible-locales.git
+- src: yatesr.timezone
+- src: geerlingguy.git
+- src: https://github.com/moviedo/ansible-role-nvm.git

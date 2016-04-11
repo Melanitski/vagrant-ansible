@@ -4,6 +4,7 @@
 
   vars:
     rvm1_user: '{{ ansible_ssh_user }}'
+    # TODO fix for gemset and  bundler insaller
     rvm1_ruby: '2.1.5'
     rvm1_gemset: 'angular-cycle-gallery'
     rvm1_rubies:
@@ -11,19 +12,30 @@
     rvm1_install_flags: '--auto-dotfiles --user-install'
     rvm1_install_path: '/home/{{ ansible_ssh_user }}/.rvm'
 
-    nvm_env: user
-    nvm_default_node_version: stable
-    nvm_node_versions:
-      - stable
+    nvm_node_version: 'v5.10.1'
+    nvm_npm_pkg:
+      - bower
+      - gulp
+
+    nvm_user: vagrant
+    nvm_node_version: "5.10.1"
+    nvm_npm_pkgs:
+      - pkg: bower
+        version: "*"
+      - pkg: gulp
+        version: "*"
+
 
     virtual_hosts:
       - { server_name: test-application.dev, root: /home/vagrant/test-application }
       - { server_name: gallery.dev, root: /home/vagrant/gallery/current/public }
 
   roles:
+    - ansible-locales
+    - yatesr.timezone
     - nginx
-    - rvm_io.rvm1-ruby
-    - nodesource.node
+    - rvm
+    - ansible-role-nvm
 
   tasks:
     - name: Add ssh user keys
@@ -32,8 +44,6 @@
     - name: Add gemset
       command: "{{ rvm1_rvm }} {{ rvm1_ruby }} do rvm gemset create {{ rvm1_gemset }}"
 
+    # Todo install bundler via rvm
     - name: Add bundler
       command: "{{ rvm1_rvm }} {{ rvm1_ruby }}@{{ rvm1_gemset }} do gem install bundler"
-
-    - name: Add bower
-      command: "npm install bower -g"
