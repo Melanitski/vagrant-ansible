@@ -1,0 +1,13 @@
+---
+- name: Create config directory
+  file: path={{project_backend_path}}/shared/config state=directory recurse=yes owner={{project_user}} group={{project_user}}
+
+- name: Add database.yml
+  template:
+    src: database.yml
+    dest: "{{project_backend_path}}/shared/config/database.yml"
+
+- name: Add secrets.yml
+  template:
+    src: secrets.yml
+    dest: "{{project_backend_path}}/shared/config/secrets.yml"

@@ -1,49 +1,56 @@
 ---
 - name: Server configuration
   hosts: all
+  user: root
 
   vars:
-    rvm1_user: '{{ ansible_ssh_user }}'
-    # TODO fix for gemset and  bundler insaller
-    rvm1_ruby: '2.1.5'
-    rvm1_gemset: 'angular-cycle-gallery'
+    # Ruby settings
+    rvm1_ruby: '2.3.0'
+    rvm1_gemset: 'merchant'
     rvm1_rubies:
       - '{{ rvm1_ruby }}'
     rvm1_install_flags: '--auto-dotfiles --user-install'
-    rvm1_install_path: '/home/{{ ansible_ssh_user }}/.rvm'
 
-    nvm_node_version: 'v5.10.1'
-    nvm_npm_pkg:
+    # Postgresql
+    postgresql_databases:
+      - name: merchant
+        owner: merchant
+    postgresql_users:
+      - name: merchant
+    postgresql_user_privileges:
+      - name: merchant
+        db: merchant
+        priv: "ALL"
+
+    # Project settings
+    project_backend_path: '/home/merchant/backend'
+    project_frontend_path: '/home/merchant/frontend'
+    project_domain: 'http://merchant.lo:8081'
+    project_user: 'merchant'
+
+    # NodeJS
+    nvm_env: system
+    nvm_version: v0.31.0
+    nvm_default_node_version: v5.10.1
+    nvm_global_packages:
       - bower
       - gulp
 
-    nvm_user: vagrant
-    nvm_node_version: "5.10.1"
-    nvm_npm_pkgs:
-      - pkg: bower
-        version: "*"
-      - pkg: gulp
-        version: "*"
-
-
+    # Nginx settings
     virtual_hosts:
-      - { server_name: test-application.dev, root: /home/vagrant/test-application }
-      - { server_name: gallery.dev, root: /home/vagrant/gallery/current/public }
+      - server_name: merchant.lo
 
   roles:
     - ansible-locales
     - yatesr.timezone
-    - nginx
-    - rvm
+    - geerlingguy.git
     - ansible-role-nvm
-
-  tasks:
-    - name: Add ssh user keys
-      authorized_key: user=vagrant key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-
-    - name: Add gemset
-      command: "{{ rvm1_rvm }} {{ rvm1_ruby }} do rvm gemset create {{ rvm1_gemset }}"
-
-    # Todo install bundler via rvm
-    - name: Add bundler
-      command: "{{ rvm1_rvm }} {{ rvm1_ruby }}@{{ rvm1_gemset }} do gem install bundler"
+    - ANXS.postgresql
+    - DavidWittman.redis
+    - rvm
+    - rvm-gemsets
+    - nginx
+    - imagemagick
+    - pg-dev
+    - user-settings
+    - hellapay-project

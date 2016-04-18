@@ -1,0 +1,5 @@
+production:
+   adapter: postgresql
+   encoding: unicode
+   database: {{postgresql_databases[0].name}}
+   pool: 5
